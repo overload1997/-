@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"os"
 	"sync"
 	"time"
 )
@@ -13,7 +14,7 @@ const (
 	Conpro    = "tcp"
 	Localaddr = "172.18.151.39"
 	Localhost = "7000"
-	Delimiter = '\t'
+	Delimiter = '\n'
 )
 
 var clientid int
@@ -21,22 +22,35 @@ var clientid int
 func init() {
 	clientid = 0
 }
-
 //并发处理客户端
 func Solve(conn net.Conn, id int) {
-	buffer := bufio.NewReader(conn)
-	for {
-		mes, err := Getmessage(conn, buffer)
-		if err != nil {
-			wg.Done()
-			fmt.Printf("Recived message from client[%d] fail.(%s)\n", id, err)
-			return
+	var brk bool = false
+	go func() { //从客户端接收信息
+		buffer := bufio.NewReader(conn)
+		for {
+			mes, err := Getmessage(conn, buffer)
+			if err != nil {
+				wg.Done()
+				fmt.Printf("Recived message from client[%d] fail.(%s)\n", id, err)
+				brk = true
+				return
+			}
+			fmt.Printf("Recived message from client[%d] successfully:%s", id, mes)
 		}
-		fmt.Printf("Recived message from client[%d] successfully(%s)\n", id, mes)
-		/*var returnmes string
-		fmt.Scanln(&returnmes)
-		Sendmessage(conn, returnmes)*/
-	}
+	}()
+	go func() { //发送信息给客户端
+		for {
+			len, err := Sendmessage(conn)
+			if err != nil {
+				fmt.Printf("发送失败:%s\n", err)
+			} else {
+				fmt.Printf("发送成功%d个字节!\n", len)
+			}
+			if brk {
+				return
+			}
+		}
+	}()
 }
 
 func Getmessage(conn net.Conn, buffer *bufio.Reader) (string, error) {
@@ -58,53 +72,29 @@ func LocalServer() {
 		return
 	}
 	fmt.Printf("The server started successfully.\n")
-	for i := 0; i < 3; i++ {
+	for {
+		wg.Add(1)
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Printf("The client comes but connected fail!(%s)\n", err)
 			break
 		}
 		fmt.Printf("The client[%d](%s) connected successfully.\n", clientid, conn.RemoteAddr())
-		//var returnmes string
-		//fmt.Scanln(&returnmes)
-		Sendmessage(conn, "呵呵")
-		fmt.Println("66")
 		go Solve(conn, clientid)
 		clientid++
 	}
 }
 
-func Client(str string, id string) {
-	//defer wg.Done()
-	conn, err := net.DialTimeout(Conpro, fmt.Sprintf("%s:%s", Localaddr, Localhost), 2*time.Second)
-	defer conn.Close()
-	defer func() {
-		fmt.Printf("client[%s]: Connection closed!\n", id)
-	}()
-	if err != nil {
-		fmt.Printf("Client[%s]: Connected to the server fail(%s)\n", id, err)
-		return
-	}
-	fmt.Printf("Client[%s]: Connected to the server successfully\n", id)
-	len, err := Sendmessage(conn, str)
-	if err != nil {
-		fmt.Printf("Client[%s]: An error comes when send message to server(%s)\n", id, err)
-	}
-	fmt.Printf("Client[%s]: Send message(%s) with %d bytes successfully!\n", id, str, len)
-}
-
-func Sendmessage(conn net.Conn, str string) (int, error) {
+func Sendmessage(conn net.Conn) (int, error) {
+	inputReader := bufio.NewReader(os.Stdin)
+	input, _ := inputReader.ReadString('\n')
 	var buffer bytes.Buffer
-	buffer.WriteString(str)
-	buffer.WriteByte(Delimiter)
+	buffer.WriteString(input)
 	return conn.Write(buffer.Bytes())
 }
 
 func main() {
-	wg.Add(3)
+	wg.Add(1)
 	go LocalServer()
-	time.Sleep(500 * time.Millisecond)
-	go Client("我是SB成俊林", "陈俊林")
-	go Client("我是SB做起林", "卓奇林")
 	wg.Wait()
 }
