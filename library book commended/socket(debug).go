@@ -66,6 +66,25 @@ func LocalServer() {
 				fmt.Printf("请输入正确的命令\n")
 				continue
 			}
+			clientindex := 0
+			if input[1] <= '9' && input[1] >= '0' {
+				var i int = 1
+				for i = 1; input[i] <= '9' && input[i] >= '0'; i++ {
+					x := input[i] - '0'
+					clientindex = clientindex*10 + int(x) //
+				}
+				if clientindex < 1 || clientindex > clientid {
+					fmt.Printf("请输入正确的客户端编号\n")
+				} else {
+					//fmt.Printf("input:%s", input)
+					var buffer bytes.Buffer
+					sendstr := input[i:]
+					//fmt.Printf(sendstr + "\n")
+					buffer.WriteString(sendstr)
+					clientarray[clientindex-1].Write(buffer.Bytes())
+				}
+			}
+
 			var buffer bytes.Buffer
 			buffer.WriteString(input)
 			//conn.Write(buffer.Bytes())
