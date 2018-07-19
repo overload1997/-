@@ -1,0 +1,13 @@
+CarId=GZU_MKZ_00006
+
+#bag of lidar
+DataFolder=/blackbox/toplidar
+
+GibraltarFolder=/jingchi/home/gibraltar
+
+#bag of radar
+BagFolder=/jingchi/home
+
+LidarImuTf=/jingchi/home/lidarimutf.txt
+
+ConfigFolder=/jingchi/home
