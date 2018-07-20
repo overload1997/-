@@ -4,29 +4,6 @@ static int bookid;
 static int userid;
 static int clustnum;
 
-struct ClUST {
-    int st;
-    std::set<int>clustset;//存放的是用户的ID
-    void GetClustStatus() {
-        int ans=0;
-        int cnt[32]={0};
-        for(auto iter:clustset) {
-            //int bookset=book_set;
-            for(int i=0;i<32;i++) {
-                if((1<<i)&iter) {
-                    cnt[i]++;
-                }
-            }
-        }
-        for(int i=0;i<32;i++) {
-            if(cnt[i]>=clustset.size()/2) {
-                ans|=1<<i;
-            }
-        }
-        st=ans;
-    }
-};
-
 struct USER {
     std::string user_name;
     int book_set;//用32位的整数代表32类书
@@ -35,8 +12,31 @@ struct USER {
         book_set=0;
     }
 };
-
 std::vector<USER>UserArr;
+
+struct ClUST {
+    int st;
+    std::set<int>clustset;//存放的是用户的ID
+    void GetClustStatus() {
+        int ans=0;
+        int cnt[32];
+        memset(cnt,0,sizeof(cnt));
+        for(auto iter:clustset) {
+            for(int i=0;i<32;i++) {
+                if((1<<i)&UserArr[iter].book_set) {
+                    cnt[i]++;
+                }
+            }
+        }
+        for(int i=0;i<32;i++) {
+            if(cnt[i]*2>=clustset.size()) {
+                ans|=1<<i;
+            }
+        }
+        st=ans;
+    }
+};
+
 std::map<std::string,int> UserId;
 std::map<int,std::string> UserName;
 std::vector<ClUST> ClustArr;
@@ -88,6 +88,16 @@ void Read_Info() { //读入文件，数据类型为 学生ID 书类号
     std::cout<<"Read_Info Finish."<<std::endl;
 }
 
+void Debug() {
+    for(int i=0;i<clustnum;i++) {
+        //std::cout<<"clust "<<i+1<<" is:"<<ClustArr[i].clustset.size()<<"people"<<std::endl;
+        for(auto uid:ClustArr[i].clustset) {
+            std::cout<<UserName[uid]<<" ";
+        }
+        std::cout<<std::endl;
+    }
+}
+
 //聚类,获得clustnum个簇
 void Get_Clust() { 
     for(int i=0;i<clustnum;i++) { //挑选clustnum个用户建立初始簇
@@ -97,43 +107,30 @@ void Get_Clust() {
         Belong[i]=i;
     }
     bool changeflag;
-    std::cout<<userid<<" "<<clustnum<<std::endl;
-    for(int itertime=0;itertime<1000;itertime++){
-        //changeflag=false;
+    for(int itertime=0;itertime<10;itertime++){
         for(int i=0;i<userid;i++) {
             int nearest_clust_id=-1;
             double nearest_clust_dis=-1;
             for(int j=0;j<clustnum;j++) {
                 double dist=GetDist(UserArr[i].book_set,ClustArr[j].st);
-                //std::cout<<dist<<" "<<nearest_clust_dis<<std::endl;
                 if(dist>nearest_clust_dis) {
                     nearest_clust_dis=dist;
                     nearest_clust_id=j;
                 }
             }
             if(Belong.find(i)!=Belong.end() && Belong[i]==nearest_clust_id ) continue;
-            changeflag=true;
+            if(Belong.find(i)!=Belong.end() && ClustArr[Belong[i]].clustset.size()==1) continue;
             ClustArr[Belong[i]].clustset.erase(i);
             ClustArr[nearest_clust_id].clustset.insert(i);
             Belong[i]=nearest_clust_id;
         }
-        //std::cout<<"iter now..."<<std::endl;
         for(int i=0;i<clustnum;i++) {
             ClustArr[i].GetClustStatus();
         }
-    } //while(changeflag);
+    } 
     std::cout<<"Get_Clust Finish."<<std::endl;
 }
 
-void Debug() {
-    for(int i=0;i<clustnum;i++) {
-        std::cout<<"clust "<<i+1<<" is:"<<std::endl;
-        for(auto uid:ClustArr[i].clustset) {
-            std::cout<<UserName[uid]<<" ";
-        }
-        std::cout<<std::endl;
-    }
-}
 
 int main() {
     Init();
