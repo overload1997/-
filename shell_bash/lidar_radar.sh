@@ -5,9 +5,9 @@ CnfPth=`pwd`/config.jcon
 UpdatePth=`pwd`/update.sh
 Gibraltar=`cat $CnfPth | grep GibraltarFolder | awk -F '=' '{print $2}'`
 ClbPth=$Gibraltar/tools/calibration/lidar_radar/calibration.sh
-BagFolder=`cat $CnfPth | grep BagFolder | awk -F '=' '{print $2}'`
+BagFolder=`cat $CnfPth | grep BagFolder | awk -F '=' 'NR==2 {print $2}'`
 LidarImuTf=`cat $CnfPth | grep LidarImuTf | awk -F '=' '{print $2}'`
-ConfigFolder=`cat $CnfPth | grep ConfigFolder | awk -F '=' '{print $2}'`
+ConfigFolder=`cat $CnfPth | grep ConfigFolder | awk -F '=' 'NR==1 {print $2}'`
 function CheckCalibration() {
 	source $Gibraltar/setup.bash
 	bagfolder_raw=`cat $ClbPth | grep -n BAG_FOLDER | awk -F ':' 'NR==1 {print $1};'`
@@ -45,12 +45,12 @@ function Calibration() {
 }
 
 function Update() {
-	config=`cat $ClbTxt | grep "conf:" | awk -F "conf:" 'END {print $2};'`
+	config=`cat xxxxxx | grep "CONF:" | awk -F "CONF:" 'END {print $2};'`
 	echo $UpdatePth
 	chmod +x $UpdatePth
 	command=" -t 2 ${config}"
 	echo $UpdatePth$command
-	source $UpdatePth$command
+	bash $UpdatePth$command
 }
 
 echo "" > xxxxxx
@@ -62,13 +62,16 @@ Calibration &
 flag=true
 while [[ "$flag" = "true" ]];
 do
-	str=`grep FINISH xxxxxx`
+	str=`grep FINISHED xxxxxx`
 	if [ "$str" != "" ];then
 		flag=false
 		echo "Update Data.................................................................................."
 		Update
 	fi
 done
+cali_pid=`grep -oE "[0-9]+(\ calibration.cc)" xxxxxx  | grep -oE "[0-9]+" | head -1`
+echo "cali_pid=$cali_pid ---------------------------------------------------------------------------------------------"
+kill -9 $cali_pid
 sleep 5
 echo "Finish........................................................................................................"
-rm -rf xxxxxx
+rm -r xxxxxx

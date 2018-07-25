@@ -15,6 +15,8 @@ Type=-1
 Path=""
 Key=""
 
+echo $ConfigArr
+
 while getopts "t:" opt; do
 	case $opt in
 		t)Type=$OPTARG
@@ -30,12 +32,13 @@ echo "Type is $Type"
 function Init() {
 	
         #find the path and the keywords
+  echo $3 $4 $5 
 	if [ "$Type" == "-1" ];then
 		echo "please enter the correct argument -t[0-toplidar;1-front-lidar;2-radar]"
 		exit;
 	elif [ "$Type" == "0" ];then 
 		flag=""
-		#查看是否双32线lidar
+		# check laser num 32
 		flag=`cat $PfPth/${TypeFile[0]} | grep "vlp32_1"`
 		if [ "$flag" != "" ];then
 			Type=1
@@ -43,7 +46,7 @@ function Init() {
 	else 
 		let "Type++"
 	fi
-	Path="$PfPth/${TypeFile[0]}"
+	Path="$PfPth/${TypeFile[$Type]}"
 	Key="${KeyWords[$Type]}"
 	echo "Key is $Key"
 }
@@ -58,13 +61,15 @@ function SetVerticalArgs() {
         newconfig="\ \ \ \ \ \ quternion: True,"
         sed -i "${LineId}c $newconfig" $Path
         let "LineId++"  
-        while [ $LineId -le $EndRaw ]
+        while [ $LineId -le $EndRaw ];
         do
+                echo "LineId:$LineId EndRaw:$EndRaw"
                 let "arg_index=${LineId}-${StartRaw}-2"  
                 newconfig="\ \ \ \ \ \ ${ConfigPre[$arg_index]}\"${ConfigArr[$arg_index]}\""
                 sed -i "${LineId}c $newconfig" $Path
                 let "LineId++"
         done
+        echo "Finish.........."
 }
 
 function CheckCalibrationJcon() {
@@ -99,12 +104,13 @@ function SetHorizontalArgs() {
 function main() {
 	Init;
 	SetVerticalArgs;
-	if [[ "$Type" == "0" || "$Type" == "1" ]];then
- 		SetHorizontalArgs;
-		echo "Horizontal"
-	fi 
+	#if [[ "$Type" == "0" || "$Type" == "1" ]];then
+ 	#	SetHorizontalArgs;
+	#	echo "Horizontal"
+	#fi 
 }
 
 
 
 main
+echo "Finish again!"

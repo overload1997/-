@@ -7,7 +7,7 @@ ClbPth=$Gibraltar/tools/calibration/lidar_imu/calibration.sh
 CarId=`cat $CnfPth | grep CarId | awk -F '=' '{print $2}'`
 PfPth="$Gibraltar/platform/$CarId"
 Vlp32Flag=`cat $PfPth/velodyne_lidar.jcon | grep "vlp32_1"`
-DataFolder=`cat $CnfPth | grep DataFolder | awk -F '=' '{print $2}'`
+DataFolder=`cat $CnfPth | grep BagFolder | awk -F '=' 'NR==1 {print $2}'`
 
 
 function CheckCalibration() {
