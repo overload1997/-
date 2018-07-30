@@ -1,15 +1,18 @@
 #globle
-CarId=GZU_MKZ_00006
-GibraltarFolder=/jingchi/home/gibraltar
-LidarImuTf=/jingchi/home/lidarimutf.txt
+CarId=GZU_MKZ_00011
+GibraltarFolder=/mnt/yclei/code/gibraltar
+LidarImuTf=/home/yucang.lei/lidarimutf.txt
 
 #bag of lidar_imu
-BagFolder=/blackbox/toplidar
+BagFolder=/mnt/yclei/data/bags/2015.07.24/calibration/mkz011
+ESTIMATE_Z_LIST=(1.58 0.58)
 
 #bag of lidar_radar
-BagFolder=/jingchi/home
-ConfigFolder=/jingchi/home
+BagFolder=/mnt/yclei/data/calibration/radar/mkz011/center
+ConfigFolder=/mnt/yclei/data/calibration/radar/mkz011/config/center
 
-#bag of lidar_lidar
-BagFolder=/jingchi/home
-FixZ=(1.52,0.75)
+
+#topic map
+hdl64=/hdl64/velodyne_points
+vlp32_1=/hdl64/velodyne_packets
+vlp32_2=/vlp32_2/velodyne_packets
