@@ -33,7 +33,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("id:%s password:%s\n", phone, password)
 	//链接数据库
 	//sqlpath := strings.Join([]string{username, ":", password, "@", conpro, "(localhost", ":", port, ")/", dbname, "?charset=utf8"}, "")
-	db, err := sql.Open("mysql", "root:qw578470347@tcp(localhost:mysql)/book_app")
+	db, err := sql.Open("mysql", "root:123456789+0@tcp(localhost:mysql)/book_app")
 	defer db.Close()
 	println("尝试ping the 数据库")
 	if err := db.Ping(); err != nil {
