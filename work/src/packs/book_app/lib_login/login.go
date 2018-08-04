@@ -27,6 +27,17 @@ type Respond struct {
 //Login接口
 func Login(w http.ResponseWriter, r *http.Request) {
 	//获取表单
+    fmt.Println("in function login")
+    res := &Respond{}
+    res.code=0
+    res.message="ok"
+    resjson,err:=json.Marshal(res);
+    fmt.Println(resjson)
+    w.Write(resjson)
+    if err!=nil {
+            log.Fatal("json error!");
+    }
+    return
 	phone := r.FormValue("phone")
 	//password := overload_aes.Unpackkey(r.FormValue("password"))
 	password := r.FormValue("password")
@@ -42,7 +53,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("连接成功")
 	//查询处理
-	rows, err := db.Query("select stu_password from user_info where phone=\"" + phone + "\"")
+	rows, err := db.Query("select phone from user_info where phone=\"" + phone + "\"")
 	if err != nil {
 		log.Fatal(err)
 		return
