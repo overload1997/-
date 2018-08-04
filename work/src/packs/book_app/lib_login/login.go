@@ -20,24 +20,13 @@ const (
 )
 
 type Respond struct {
-	code    int
-	message string
+	Code    int
+	Message string
 }
 
 //Login接口
 func Login(w http.ResponseWriter, r *http.Request) {
 	//获取表单
-    fmt.Println("in function login")
-    res := &Respond{}
-    res.code=0
-    res.message="ok"
-    resjson,err:=json.Marshal(res);
-    fmt.Println(resjson)
-    w.Write(resjson)
-    if err!=nil {
-            log.Fatal("json error!");
-    }
-    return
 	phone := r.FormValue("phone")
 	//password := overload_aes.Unpackkey(r.FormValue("password"))
 	password := r.FormValue("password")
@@ -53,32 +42,34 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("连接成功")
 	//查询处理
-	rows, err := db.Query("select phone from user_info where phone=\"" + phone + "\"")
+	rows, err := db.Query("select password from user_info where phone=\"" + phone + "\"")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	userexit := false //数据库中存不存在该账户
 	respond := &Respond{}
-	userexit = true
-	var psw string
-	err = rows.Scan(&psw)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	if psw != password {
-		respond.code = 11
-		respond.message = "请输入正确的密码!"
-		//return
-	} else {
-		respond.code = 0
-		respond.message = "密码正确!"
-		//return
+	for rows.Next() {
+		userexit = true
+		var psw string
+		err = rows.Scan(&psw)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		if psw != password {
+			respond.Code = 11
+			respond.Message = "请输入正确的密码!"
+			//return
+		} else {
+			respond.Code = 0
+			respond.Message = "密码正确!"
+			//return
+		}
 	}
 	if !userexit {
-		respond.code = 10
-		respond.message = "请输入正确的帐号"
+		respond.Code = 10
+		respond.Message = "请输入正确的帐号"
 	}
 	re, err1 := json.Marshal(respond)
 	if err1 != nil {
