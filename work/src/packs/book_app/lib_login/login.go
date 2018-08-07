@@ -42,7 +42,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("连接成功")
 	//查询处理
-	rows, err := db.Query("select password from user_info where phone=\"" + phone + "\"")
+	rows, err := db.Query("select password from user_info where phone=" + phone)
 	if err != nil {
 		log.Fatal(err)
 		return

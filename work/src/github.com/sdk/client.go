@@ -100,9 +100,6 @@ func createHttp(conf *YunpianConf) *http.Client {
             KeepAlive: conf.Http.KeepAlive * time.Second,
             DualStack: true,
         }).DialContext,
-        MaxIdleConns:        conf.Http.MaxIdleConns,
-        IdleConnTimeout:     conf.Http.IdleConnTimeout * time.Second,
-        TLSHandshakeTimeout: conf.Http.TLSHandshakeTimeout * time.Second,
     }
     return &http.Client{Transport: tr}
 }
