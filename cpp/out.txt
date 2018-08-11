@@ -1,14 +1,4 @@
-phone := r.FormValue("phone")
-nickname := r.FormValue("nickname")
-sex := r.FormValue("sex")
-pro_photo := r.FormValue("pro_photo")
-signatrue := r.FormValue("signatrue")
-fmt.Println("phone:",phone)
-fmt.Println("nickname:",nickname)
-fmt.Println("sex:",sex)
-fmt.Println("pro_photo:",pro_photo)
-fmt.Println("signatrue:",signatrue)
-db, err := sql.Open("mysql", "root:123456789+0@tcp(localhost:mysql)/book_app")
+db, _ := sql.Open(SqlDriver, SqlSourceName)
 defer db.Close()
 println("尝试ping the 数据库")
 if err := db.Ping(); err != nil {
@@ -16,5 +6,4 @@ if err := db.Ping(); err != nil {
 	return
 }
 fmt.Println("连接成功")
-db.Query("select phone from user_info where phone="+phone)
-db.Query("update user_info set nickname="+nickname+",sex="+sex+",pro_photo="+pro_photo+",signature="+signature+" where phone="+phone)
+db.Query("update user_info set password="+new_password+" where phone="+phone)

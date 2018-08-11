@@ -15,7 +15,7 @@ int main() {
         string str="fmt.Println(\""+s[i]+":\","+s[i]+")";
         fout<<str<<endl;
     }
-    fout<<"db, _ := sql.Open(\"mysql\", \"root:123456789+0@tcp(localhost:mysql)/book_app\")"<<endl;
+    fout<<"db, _ := sql.Open(SqlDriver, SqlSourceName)"<<endl;
     fout<<"defer db.Close()"<<endl;
 	fout<<"println(\"尝试ping the 数据库\")"<<endl;
 	fout<<"if err := db.Ping(); err != nil {"<<endl;
@@ -94,7 +94,11 @@ int main() {
         //         db_str+=total_db_string[i];
         //     }
         // }
-        fout<<"db.Query(\""+db_str+")"<<endl;
+        if (cmd==2) {
+            fout<<"db.Query(\""+db_str+"\")"<<endl;
+        } else {
+            fout<<"db.Query(\""+db_str+")"<<endl;
+        }
         cout<<"please input command -1:exit 0:query语句 1:update数据 2:add新行 3:delete某一行 :\n";
     }
 }

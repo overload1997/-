@@ -36,7 +36,7 @@ func Stu_update(w http.ResponseWriter, r *http.Request) {
     fmt.Println("sex:",sex)
     fmt.Println("pro_photo:",pro_photo)
     fmt.Println("signature:",signature)
-    db, _ := sql.Open("mysql", "root:123456789+0@tcp(localhost:mysql)/book_app")
+    db, _ := sql.Open(Sql_driver,Sql_source_name)
     defer db.Close()
     println("尝试ping the 数据库")
     if err := db.Ping(); err != nil {
