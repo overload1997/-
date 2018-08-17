@@ -1,20 +1,33 @@
-//phone,password,new_password,sesson_id
-
 package main
+//phone,password,new_password,sesson_id
 import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"io/ioutil"
 )
 
+type ResetPasswordObj struct {
+	Phone string
+	Password string
+	New_password string
+	Sesson_id string
+}
 
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
-	phone := r.FormValue("phone")
-	password := r.FormValue("password")
-	new_password := r.FormValue("new_password")
-	sesson_id := r.FormValue("sesson_id")
+	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	fmt.Println(string(str))
+	request:=&ResetPasswordObj{}
+	err:=json.Unmarshal(str,request)
+	if err!=nil {
+		log.Fatal(err)
+	}
+	phone := request.Phone
+	password := request.Password
+	new_password := request.New_password
+	sesson_id := request.Sesson_id
 	fmt.Println("phone:",phone)
 	fmt.Println("password:",password)
 	fmt.Println("new_password:",new_password)

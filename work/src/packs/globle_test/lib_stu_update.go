@@ -7,18 +7,33 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
 )
 
+type StuUpdateObj struct {
+	Phone string
+	Nickname string
+	Sex string
+	Pro_photo string
+	Signature string
+	Sesson_id string
+}
 //phone,nickname,sex,pro_photo,signature
 func Stu_update(w http.ResponseWriter, r *http.Request) {
-    phone := r.FormValue("phone")
-    nickname := r.FormValue("nickname")
-    sex := r.FormValue("sex")
-    pro_photo := r.FormValue("pro_photo")
-	signature := r.FormValue("signature")
-	sesson_id := r.FormValue("sesson_id")
+	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	fmt.Println(string(str))
+	request:=&StuUpdateObj{}
+	err:=json.Unmarshal(str,request)
+	if err!=nil {
+		log.Fatal(err)
+	}
+    phone := request.Phone
+    nickname := request.Nickname
+    sex := request.Sex
+    pro_photo := request.Pro_photo
+	signature := request.Signature
+	sesson_id := request.Sesson_id
 
     fmt.Println("phone:",phone)
     fmt.Println("nickname:",nickname)

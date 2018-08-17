@@ -6,10 +6,22 @@ import "fmt"
 import "encoding/json"
 import "log"
 import "time"
+import "io/ioutil"
+
+type SendObj struct {
+	Phone string
+}
 
 func Send_message (w http.ResponseWriter, r *http.Request) {
-	re := &Respond{}
-	phone := r.FormValue("phone")
+	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	fmt.Println(string(str))
+	request:=&LoginObj{}
+	re:=&Respond{}
+	err:=json.Unmarshal(str,request)
+	if err!=nil {
+		log.Fatal(err)
+	}
+	phone := request.Phone
 	fmt.Println("sent indentify code to "+phone)
 	clnt := ypclnt.New("87e94501913ea1c29076964f9f8b4c63")
 	param := ypclnt.NewParam(2)

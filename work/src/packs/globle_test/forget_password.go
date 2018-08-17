@@ -7,12 +7,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"io/ioutil"
 )
 
+type ForgetPasswordObj struct {
+	Phone string
+	Identify_code string
+	New_password string
+}
+
 func ForgetPassword(w http.ResponseWriter, r *http.Request) {
-	phone := r.FormValue("phone")
-	identify_code := r.FormValue("identify_code")
-	new_password := r.FormValue("new_password")
+	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	fmt.Println(string(str))
+	request:=&ForgetPasswordObj{}
+	err:=json.Unmarshal(str,request)
+	if err!=nil {
+		log.Fatal(err)
+	}
+	phone := request.Phone
+	identify_code := request.Identify_code
+	new_password := request.New_password
 	fmt.Println("phone:",phone)
 	fmt.Println("identify_code:",identify_code)
 	fmt.Println("new_password:",new_password)

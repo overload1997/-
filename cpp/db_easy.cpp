@@ -1,3 +1,20 @@
+/*
+type UserObj struct {
+	Phone string
+	Password string
+}
+str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+fmt.Println(string(str))
+request:=&UserObj{}
+err:=json.Unmarshal(str,request)
+if err!=nil {
+    log.Fatal(err)
+}
+phone := request.Phone
+password := request.Password
+
+*/
+
 #include<bits/stdc++.h>
 using namespace std;
 int main() {

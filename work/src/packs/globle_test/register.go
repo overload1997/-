@@ -7,12 +7,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"io/ioutil"
 )
 
+type RegisterObj struct {
+	Phone string
+	Password string
+	Identify_code string
+}
+
 func Register(w http.ResponseWriter, r *http.Request) {
-	phone := r.FormValue("phone")
-	identify_code := r.FormValue("identify_code")
-	password := r.FormValue("password")
+	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	fmt.Println(string(str))
+	request:=&RegisterObj{}
+	err:=json.Unmarshal(str,request)
+	if err!=nil {
+		log.Fatal(err)
+	}
+	phone := request.Phone
+	identify_code := request.Identify_code
+	password := request.Password
 	fmt.Println("phone:",phone)
 	fmt.Println("identify_code:",identify_code)
 	fmt.Println("password:",password)

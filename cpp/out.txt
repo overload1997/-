@@ -1,3 +1,13 @@
+phone := r.FormValue("phone")
+password := r.FormValue("password")
+sex := r.FormValue("sex")
+photo := r.FormValue("photo")
+name := r.FormValue("name")
+fmt.Println("phone:",phone)
+fmt.Println("password:",password)
+fmt.Println("sex:",sex)
+fmt.Println("photo:",photo)
+fmt.Println("name:",name)
 db, _ := sql.Open(SqlDriver, SqlSourceName)
 defer db.Close()
 println("尝试ping the 数据库")
@@ -6,4 +16,4 @@ if err := db.Ping(); err != nil {
 	return
 }
 fmt.Println("连接成功")
-db.Query("update user_info set password="+new_password+" where phone="+phone)
+db.Query("update  set  where "+)

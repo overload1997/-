@@ -7,14 +7,25 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
 )
 
+type LoginObj struct {
+	Phone string
+	Password string
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
-	//获取表单
-	phone := r.FormValue("phone")
-	password := r.FormValue("password")
+	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	fmt.Println(string(str))
+	request:=&LoginObj{}
+	err:=json.Unmarshal(str,request)
+	if err!=nil {
+		log.Fatal(err)
+	}
+	phone := request.Phone
+	password := request.Password
 	fmt.Printf("id:%s password:%s\n", phone, password)
 	//链接数据库
 	db, _ := sql.Open(SqlDriver, SqlSourceName)
