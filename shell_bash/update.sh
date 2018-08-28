@@ -43,7 +43,7 @@ function SetVerticalArgs() {
         while [ $line_id -le $end_raw ]
         do
                 let "arg_index=${line_id}-${start_raw}-2"  
-                new_config="\ \ \ \ \ \ ${ConfigPre[$arg_index]}\"${Conf[$arg_index]}\""
+                new_config="\ \ \ \ \ \ ${ConfigPre[$arg_index]}\"${Conf[$arg_index]}\","
                 sed -i "${line_id}c $new_config" $Path
                 let "line_id++"
         done

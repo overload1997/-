@@ -8,6 +8,9 @@ ClbPth=$Gibraltar/tools/calibration/lidar_radar/calibration.sh
 BagFolder=`cat $CnfPth | grep BagFolder | awk -F '=' 'NR==2 {print $2}'`
 LidarImuTf=`cat $CnfPth | grep LidarImuTf | awk -F '=' '{print $2}'`
 ConfigFolder=`cat $CnfPth | grep ConfigFolder | awk -F '=' '{print $2}'`
+TfYamlPth=$Gibraltar/tools/calibration/lidar_radar/lidar_radar_tf.yaml
+EvlPth=$Gibraltar/tools/calibration/lidar_radar/evaluation.sh
+
 function CheckCalibration() {
 	# source $Gibraltar/setup.bash
 	bag_folder_raw=`cat $ClbPth | grep -n BAG_FOLDER | awk -F ':' 'NR==1 {print $1};'`
@@ -37,6 +40,13 @@ function CheckCalibration() {
 		exit;
 	fi
 	sed -i "${tf_input_raw}c LIDAR_IMU_TF=${LidarImuTf}" $ClbPth
+
+	sed -i "/GIBRALTAR_ROOT=/c GIBRALTAR_ROOT=$Gibraltar" $EvlPth
+  sed -i "/BAG_FOLDER=/c BAG_FOLDER=$BagFolder" $EvlPth
+  sed -i "/CONFIG_FOLDER=/c CONFIG_FOLDER=$ConfigFolder" $EvlPth
+
+
+
 }
 
 function Calibration() {
@@ -50,6 +60,12 @@ function Update() {
 	command=" -t 3 ${config}"
 	echo "Run $UpdatePth$command"
 	bash $UpdatePth$command
+  echo $config >> lidar_radar_temp_tf
+	echo "[$config" > $TfYamlPth
+	sed -i "s/ /,/g" $TfYamlPth
+  sed -i "s/,,/,/g" $TfYamlPth
+  sed -i '$s/,$//' $TfYamlPth
+  echo "]" >> $TfYamlPth
 }
 
 echo "" > xxxxxx

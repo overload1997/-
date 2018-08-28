@@ -1,18 +1,21 @@
 #! /bin/bash
 ConfigPath=`pwd`/config.jcon
 CarId=`grep "CarId" $ConfigPath | awk -F '=' '{print $2}'`
-TfPath=`grep "LidarImuTf" $ConfigPath | awk -F '=' '{print $2}'`
 UpdatePth=`pwd`/update.sh
 Gibraltar=`grep "GibraltarFolder" $ConfigPath | awk -F '=' '{print $2}'`
+TfPath=$Gibraltar/tools/calibration/lidar_radar/lidar_imu_tf.txt
 ClbPth=$Gibraltar/tools/calibration/lidar_imu/calibration_multi.sh
 PfPth="$Gibraltar/platform/$CarId"
 BagFolder=`grep "BagFolder" $ConfigPath | awk -F '=' 'NR==1 {print $2}'`
 EstimateZList=`grep "ESTIMATE_Z_LIST" $ConfigPath | awk -F '=' '{print $2}'`
 TypeStr=("hdl64" "vlp32_1" "vlp32_2" "radar")
+TfYamlPth=$Gibraltar/tools/calibration/lidar_imu/multi_lidar.yaml
 ConfArr=""
 LaserNum=""
 TopicList=""
+SensorName=("top_lidar(64)" "top_lidar(32)" "front_lidar(32)" "radar(delphi)")
 
+source $Gibraltar/setup.bash
 function CheckCalibration() {
 	echo "CheckCalibration..."
 	map_raw=`grep -n "topic map" $ConfigPath | awk -F ':' '{print $1}'`
@@ -31,7 +34,7 @@ function CheckCalibration() {
 			continue
 		fi
 		laser_num=`echo $key | grep -Po "[0-9]+" | head -n 1`
-		echo $laser_num,$topic
+    echo $laser_num,$topic
 		LaserNum="$LaserNum $laser_num"
 		TopicList="$TopicList $topic"
 		index=0
@@ -66,9 +69,12 @@ function Calibration() {
 
 function Update() {
 	echo "Update...	"
+	echo "[" > $TfYamlPth
 	conf_index=1;
 	while [[ `cat xxxxxx20180726 | grep "finish"` == "" ]]; 
 	do
+    sleep 1
+    echo Conf${conf_index}
 		flag=`cat xxxxxx20180726 | grep Conf${conf_index} | awk -F "Conf${conf_index}:" '{print $2}'`
 		if [[ $flag == "" ]]; then
 			continue;
@@ -76,6 +82,9 @@ function Update() {
 		let "lidar_type=conf_index-1"
 		echo "ConArr[$lidar_type]=${ConfArr[$lidar_type]} "
 		cmd="bash `pwd`/update.sh -t ${ConfArr[$lidar_type]} $flag"
+		echo ${SensorName[$lidar_type]}: >> lidar_sensor_name
+		echo "[${flag}]," >> $TfYamlPth
+    echo $flag >> lidar_temp_tf
 		if [[ $lidar_type=="0" || $lidar_type=="1" ]]; then
 			echo $flag > $TfPath
 		fi
@@ -88,6 +97,9 @@ function Update() {
 	echo "cali_pid=$cali_pid and it will be killed."
 	kill -9 $cali_pid
 	rm -r xxxxxx20180726
+	sed -i 's/ /,/g' $TfYamlPth
+	sed -i '$s/,$//' $TfYamlPth
+	echo "]" >> $TfYamlPth
 }
 
 CheckCalibration;
