@@ -51,7 +51,7 @@ func Stu_update(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("连接成功")
 	respond := &Respond{}
-	if SessonMap[phone].SessonId == "" {
+	if SessonMap[phone] == nil {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
 	} else if sesson_id != SessonMap[phone].SessonId {

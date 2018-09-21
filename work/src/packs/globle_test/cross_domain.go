@@ -12,3 +12,4 @@ func ReceiveClientRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Println("收到客户端请求: ", r.Form)
 }
+

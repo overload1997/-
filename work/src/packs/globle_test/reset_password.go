@@ -45,7 +45,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	rows,_ := db.Query("select password from user_info where phone="+phone)
 	for rows.Next() {
 		rows.Scan(&flag_password)
-		if SessonMap[phone].SessonId == "" {
+		if SessonMap[phone] == nil {
 			respond.Code = Code.SidNone			
 			respond.Message = Message.SidNone
 		} else if sesson_id != SessonMap[phone].SessonId {

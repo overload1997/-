@@ -11,7 +11,7 @@ import (
 
 var Globle_total_people = 0
 
-func main() {
+func RunServer() {
 	CodeInit()
 	MessageInit()
 	http.HandleFunc("/", ReceiveClientRequest) //解决跨域问题
@@ -19,6 +19,8 @@ func main() {
 	http.HandleFunc("/user/register", Register)
 	http.HandleFunc("/user/identify_code", Send_message)
 	http.HandleFunc("/user/stu_update", Stu_update)
+	http.HandleFunc("/user/get_fri_list", GetUserFocus)
+	http.HandleFunc("/user/add_friend", AddUserFocus)
 	err := http.ListenAndServe(":5666", nil)
 	if err != nil {
 		log.Fatal(err)

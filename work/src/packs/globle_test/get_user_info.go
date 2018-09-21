@@ -13,7 +13,7 @@ import (
 
 type GetUserInfoObj struct {
 	Phone string
-	Sesson_id int
+	Sesson_id string
 }
 
 type UserInfo struct {
@@ -39,7 +39,7 @@ type GetUserInfoRespond struct {
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	fmt.Println(string(str))
-	request:=&StuUpdateObj{}
+	request:=&GetUserInfoObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
 		log.Fatal(err)
@@ -59,7 +59,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("连接成功")
 	respond := &GetUserInfoRespond{}
-	if SessonMap[phone].SessonId == "" {
+	if SessonMap[phone] == nil {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
 	} else if sesson_id != SessonMap[phone].SessonId {
