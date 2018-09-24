@@ -1,9 +1,9 @@
 package main
 
 import (
-	"database/sql"
+	//"database/sql"
 	"fmt"
-	"log"
+	//"log"
 	"sort"
 )
 
@@ -31,7 +31,7 @@ func (a farmiliar_obj_slice) Less(i, j int) bool {    // 重写 Less() 方法，
 
 var farmiliar_count int = 10
 
-func HaveBorrow(stu_id string) {
+/*func HaveBorrow(stu_id string) {
 	db,_:=sql.Open(SqlDriver,SqlSourceName)
 	defer db.Close()
 	//println("尝试连接数据库......")
@@ -55,7 +55,7 @@ func HaveBorrow(stu_id string) {
 		}
 		
 	}
-}
+}*/
 
 func GetFarmiliar() {
 	fmt.Println("接下来将运行协同过滤算法")
@@ -70,7 +70,7 @@ func GetFarmiliar() {
 				Farmiliar[stud1] = append(Farmiliar[stud1], fml_obj)
 			}
 			sort.Sort(farmiliar_obj_slice(Farmiliar[stud1]))
-			if UserName[stud1] != "1505100008" {
+			/*if UserName[stud1] != "1505100008" {
 				continue
 			}
 			fmt.Printf("跟学生%v兴趣最相似的%d个人是:\n",UserName[stud1],farmiliar_count)
@@ -93,7 +93,7 @@ func GetFarmiliar() {
 				}
 				HaveBorrow(UserName[stud2])
 			}
-			fmt.Println()
+			fmt.Println()*/
 		}
 	}
 }

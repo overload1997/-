@@ -256,10 +256,6 @@ func GetClust() {
 }
 
 func Merge() {
-	fmt.Println("")
-}
-
-func main() {
 	Init()
 	ReadBorrowInfo()
 	GetClust()

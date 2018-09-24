@@ -15,6 +15,7 @@ func CodeInit() {
 	Code.IdtCodeErr=52
 	Code.DatabaseErr=-1
 	Code.IdtCodeOverdue=53
+	Code.UnConfirmStu=60
 }
 
 var Message = &ResponMessage{}
@@ -33,6 +34,7 @@ func MessageInit() {
 	Message.IdtCodeOverdue  = "验证码过期"
 	Message.DatabaseErr = "数据库出错"
 	Message.IdtCodeOverdue = "验证码过期"
+	Message.UnConfirmStu = "该学生未进行验证"
 }
 
 type ResponCode struct {
@@ -49,6 +51,7 @@ type ResponCode struct {
 	IdtCodeErr  int //验证码不正确
 	DatabaseErr int //数据库出错
 	IdtCodeOverdue int //验证码过期
+	UnConfirmStu int //学生未进行验证
 }
 
 type ResponMessage struct {
@@ -65,4 +68,5 @@ type ResponMessage struct {
 	IdtCodeErr  string //验证码不正确
 	DatabaseErr string //数据库出错
 	IdtCodeOverdue string //验证码过期
+	UnConfirmStu string //学生未进行验证
 }
