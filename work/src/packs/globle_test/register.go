@@ -51,10 +51,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.PswFormatErr
 		respond.Message = Message.PswFormatErr
 	} else {
-		if identify_code!=IdentifyCodeMap[phone].IdtCode {
+		if _,ok:=IdentifyCodeMap[phone] ; ok==false || identify_code!=IdentifyCodeMap[phone].IdtCode {
 			respond.Code = Code.IdtCodeErr
 			respond.Message = Message.IdtCodeErr
-		} else if IdentifyCodeMap[phone].CheckOverdue() {
+		} else if _,ok:=IdentifyCodeMap[phone] ; ok && IdentifyCodeMap[phone].CheckOverdue() {
 			respond.Code = Code.IdtCodeOverdue
 			respond.Message = Message.IdtCodeOverdue
 		} else {

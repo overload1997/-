@@ -26,6 +26,7 @@ func Send_message (w http.ResponseWriter, r *http.Request) {
 	clnt := ypclnt.New("87e94501913ea1c29076964f9f8b4c63")
 	param := ypclnt.NewParam(2)
 	idt_code := Get_rand_num(4)
+	fmt.Printf("create indentify code%s\n", idt_code)
 	param[ypclnt.MOBILE] = phone
 	param[ypclnt.TEXT] = "【云片网】您的验证码是" + idt_code
 	send_back := clnt.Sms().SingleSend(param)
