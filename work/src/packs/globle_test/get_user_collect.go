@@ -24,7 +24,12 @@ type GetUserCollectRespond struct {
 
 //phone,nickname,sex,pro_photo,signature
 func GetUserCollect(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	if string(str) =="" {
+		return
+	}
 	fmt.Println(string(str))
 	request:=&UserFocusObj{}
 	err:=json.Unmarshal(str,request)
