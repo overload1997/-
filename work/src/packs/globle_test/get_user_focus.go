@@ -27,6 +27,7 @@ type FocurUser struct {
 type UserFocusRespond struct {
 	Code int
 	Message string
+	Focus_users_empty string
 	Focus_users []FocurUser
 }
 
@@ -95,7 +96,12 @@ func GetUserFocus(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-    }
+	}
+	if len(respond.Focus_users) == 0 {
+		respond.Focus_users_empty="true"
+	} else {
+		respond.Focus_users_empty="false"
+	}
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
 		log.Fatal(json_err)
