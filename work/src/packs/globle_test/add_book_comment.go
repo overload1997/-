@@ -55,13 +55,13 @@ func AddBookComment(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("连接成功")
 	respond := &AddBookCommentRespond{}
-	if SessonMap[phone] == nil {
+    if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
-	} else if sesson_id != SessonMap[phone].SessonId {
+	} else if _,ok:=SessonMap[phone]; ok&&sesson_id != SessonMap[phone].SessonId {
 		respond.Code = Code.SidErr
 		respond.Message = Message.SidErr
-	} else if SessonMap[phone].CheckOverdue() {
+	} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	} else {

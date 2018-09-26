@@ -16,10 +16,18 @@ type UserFocusObj struct {
 	Sesson_id string
 }
 
+type FocurUser struct {
+	Phone string
+	Nickname string
+	Sinature string
+	School string
+	Pro_photo string
+}
+
 type UserFocusRespond struct {
 	Code int
 	Message string
-	Focus_user []string
+	Focus_users []FocurUser
 }
 
 //phone,nickname,sex,pro_photo,signature
@@ -51,16 +59,16 @@ func GetUserFocus(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("连接成功")
 	respond := &UserFocusRespond{}
-	if SessonMap[phone].SessonId == "" {
+    if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
-	} else if sesson_id != SessonMap[phone].SessonId {
+	} else if _,ok:=SessonMap[phone]; ok&&sesson_id != SessonMap[phone].SessonId {
 		respond.Code = Code.SidErr
 		respond.Message = Message.SidErr
-	} else if SessonMap[phone].CheckOverdue() {
+	} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
-	}  else {
+	} else {
 		rows,db_err:=db.Query("select user_y from user_focus_user where user_x="+phone)
 		fmt.Printf("%s\n", "select user_y from user_focus_user where user_x="+phone)
 		if db_err != nil {
@@ -73,7 +81,18 @@ func GetUserFocus(w http.ResponseWriter, r *http.Request) {
 			var focus_user string
 			for rows.Next() {
 				rows.Scan(&focus_user)
-				respond.Focus_user = append(respond.Focus_user, focus_user)
+				user_query := "select phone,nickname,signature,school,pro_photo from user_info where phone=\""+focus_user+"\""
+				fmt.Println(user_query)
+				user,user_err:=db.Query(user_query)
+				if user_err!=nil {
+					fmt.Println(user_err)
+					return
+				}
+				for user.Next() {
+					focus_user := FocurUser{}
+					user.Scan(&focus_user.Phone,&focus_user.Nickname,&focus_user.Sinature,&focus_user.School,&focus_user.Pro_photo)
+					respond.Focus_users = append(respond.Focus_users, focus_user)
+				}
 			}
 		}
     }
