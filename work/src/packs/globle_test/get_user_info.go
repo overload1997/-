@@ -47,7 +47,8 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	request:=&GetUserInfoObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+        return
 	}
     phone := request.Phone
 	sesson_id := request.Sesson_id
@@ -64,13 +65,13 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("连接成功")
 	respond := &GetUserInfoRespond{}
-	if SessonMap[phone] == nil {
+    if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
-	} else if sesson_id != SessonMap[phone].SessonId {
+} else if _,ok:=SessonMap[phone]; ok&&sesson_id != SessonMap[phone].SessonId {
 		respond.Code = Code.SidErr
 		respond.Message = Message.SidErr
-	} else if SessonMap[phone].CheckOverdue() {
+} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	}  else {

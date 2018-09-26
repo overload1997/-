@@ -20,6 +20,7 @@ func ForgetPassword(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("受到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+    fmt.Println(string(str))
 	if string(str) =="" {
 		return
 	}
@@ -56,7 +57,7 @@ func ForgetPassword(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.PswFormatErr
 		respond.Message = Message.PswFormatErr
 	} else {
-		if identify_code!=IdentifyCodeMap[phone].IdtCode {
+        if idt,ok:=IdentifyCodeMap[phone]; ok==false || idt.IdtCode!=identify_code {
 			respond.Code = Code.IdtCodeErr
 			respond.Message = Message.IdtCodeErr
 		} else if IdentifyCodeMap[phone].CheckOverdue() {
