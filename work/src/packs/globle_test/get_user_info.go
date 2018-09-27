@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -17,8 +16,8 @@ type GetUserInfoObj struct {
 }
 
 type UserInfo struct {
-	Id int
-	Password string
+	//Id int
+	//Password string
 	Pro_photo string
 	Signature string
 	School string
@@ -60,7 +59,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
     defer db.Close()
     println("尝试ping the 数据库")
     if err := db.Ping(); err != nil {
-        log.Fatal(err)
+        fmt.Println(err)
         return
     }
     fmt.Println("连接成功")
@@ -82,10 +81,14 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		} else {
 			respond.Code = Code.Success
 			respond.Message = Message.Success	
+			var id_ string
+			var password_ string
 			for rows.Next() {
 				rows.Scan(
-					&respond.User.Id,
-					&respond.User.Password,
+					//&respond.User.Id,
+					//&respond.User.Password,
+					id_,
+					password_,
 					&respond.User.Pro_photo,
 					&respond.User.Signature,
 					&respond.User.School,
@@ -103,7 +106,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
-		log.Fatal(json_err)
+		fmt.Println(json_err)
 		return
 	}
 	w.Write(json_respond)
