@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -19,7 +18,7 @@ type GetUserCollectObj struct {
 type GetUserCollectRespond struct {
 	Code int
 	Message string
-	Collect_book []string
+	IsbnList []string
 }
 
 //phone,nickname,sex,pro_photo,signature
@@ -34,7 +33,8 @@ func GetUserCollect(w http.ResponseWriter, r *http.Request) {
 	request:=&UserFocusObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
     phone := request.Phone
 	sesson_id := request.Sesson_id
@@ -46,7 +46,7 @@ func GetUserCollect(w http.ResponseWriter, r *http.Request) {
     defer db.Close()
     println("尝试ping the 数据库")
     if err := db.Ping(); err != nil {
-        log.Fatal(err)
+        fmt.Println(err)
         return
     }
     fmt.Println("连接成功")
@@ -61,8 +61,8 @@ func GetUserCollect(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	}  else {
-		rows,db_err:=db.Query("select book_name from user_collect where user="+phone)
-		fmt.Printf("%s\n", "select book_name from user_collect where user="+phone)
+		rows,db_err:=db.Query("select book_isbn from user_collect where user="+phone)
+		fmt.Printf("%s\n", "select book_isbn from user_collect where user="+phone)
 		if db_err != nil {
 			fmt.Printf("%s\n", db_err)
 			respond.Code = Code.DatabaseErr
@@ -73,13 +73,13 @@ func GetUserCollect(w http.ResponseWriter, r *http.Request) {
 			var collect_book string
 			for rows.Next() {
 				rows.Scan(&collect_book)
-				respond.Collect_book = append(respond.Collect_book, collect_book)
+				respond.IsbnList = append(respond.IsbnList, collect_book)
 			}
 		}
     }
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
-		log.Fatal(json_err)
+		fmt.Println(json_err)
 		return
 	}
 	w.Write(json_respond)
