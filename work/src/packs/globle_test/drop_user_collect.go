@@ -12,9 +12,8 @@ import (
 
 type DropUserCollectObj struct {
 	Phone string
-	Book_isbn string
+	Isbn string
 	Sesson_id string
-	Book_name string
 }
 
 type DropUserCollectRespond struct {
@@ -39,13 +38,11 @@ func DropUserCollect(w http.ResponseWriter, r *http.Request) {
 	}
     phone := request.Phone
 	sesson_id := request.Sesson_id
-	book_isbn := request.Book_isbn
-	book_name := request.Book_name
+	book_isbn := request.Isbn
 
     fmt.Println("phone:",phone)
 	fmt.Println("sesson_id:",sesson_id)
 	fmt.Println("book_isbn:",book_isbn)
-	fmt.Println("book_name:",book_name)
 
     db, _ := sql.Open(SqlDriver, SqlSourceName)
     defer db.Close()
@@ -66,8 +63,8 @@ func DropUserCollect(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	}  else {
-		_,db_err:=db.Query("insert into user_collect(user, book_name,book_isbn) values("+phone+","+book_name+","+book_isbn+")")
-		fmt.Printf("%s\n", "insert into user_collect(user, book_name,book_isbn) values("+phone+","+book_name+","+book_isbn+")")
+		_,db_err:=db.Query(`delete from user_collect where phone="`+phone+`" and isbn="`+book_isbn+`"`)
+		fmt.Printf("%s\n", `delete from user_collect where phone="`+phone+`" and isbn="`+book_isbn+`"`)
 		if db_err != nil {
 			fmt.Printf("%s\n", db_err)
 			respond.Code = Code.DatabaseErr
