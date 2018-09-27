@@ -87,8 +87,8 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 				rows.Scan(
 					//&respond.User.Id,
 					//&respond.User.Password,
-					id_,
-					password_,
+					&id_,
+					&password_,
 					&respond.User.Pro_photo,
 					&respond.User.Signature,
 					&respond.User.School,
