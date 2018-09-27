@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -18,7 +17,7 @@ type LoginObj struct {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	
-	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	if string(str) =="" {
@@ -29,7 +28,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	request:=&LoginObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	phone := request.Phone
 	password := request.Password
@@ -39,14 +39,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	println("尝试ping the 数据库")
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return
 	}
 	fmt.Println("连接成功")
 	//查询处理
 	rows, err := db.Query("select password from user_info where phone=" + phone)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return
 	}
 	userexit := false //数据库中存不存在该账户
@@ -57,7 +57,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		var psw string
 		err = rows.Scan(&psw)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 			return
 		}
 		if psw != password {
@@ -77,7 +77,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	respond.Sesson=user_sesson
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
-		log.Fatal(json_err)
+		fmt.Println(json_err)
 		return
 	}
 	w.Write(json_respond)

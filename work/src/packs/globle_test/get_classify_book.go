@@ -1,4 +1,3 @@
-//为客户端提供一个登录接口
 package main
 
 import (
@@ -10,25 +9,25 @@ import (
 	_ "github.com/Go-SQL-Driver/MySQL"
 )
 
-type QueryBookCommentObj struct {
-	Phone string
+type ClassifyBook struct {
 	Isbn string
+	BookName string
+}
+
+type GetClassifyBookRespond struct {
+	Code int
+	Message string
+	BookList []ClassifyBook
+}
+
+type GetClassifyBookObj struct {
+	Phone string
+	Type string
+	K string
 	Sesson_id string
 }
 
-type BookCommentObj struct {
-	Phone string
-	Content string
-}
-
-type QueryBookCommentRespond struct {
-	Message string
-	Code int
-	CommentList []BookCommentObj
-}
-
-//phone,nickname,sex,pro_photo,signature
-func QueryBookComment(w http.ResponseWriter, r *http.Request) {
+func GetClassifyBook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
@@ -36,18 +35,19 @@ func QueryBookComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(string(str))
-	request:=&QueryBookCommentObj{}
+	request:=&GetClassifyBookObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
 		fmt.Println(err)
 		return
 	}
 	phone := request.Phone
-	isbn := request.Isbn
+	book_type := request.Type
+	k := request.K
 	sesson_id := request.Sesson_id
 
-    fmt.Println("phone:",phone)
-    fmt.Println("isbn:",isbn)
+    fmt.Println("book_type:",book_type)
+    fmt.Println("k:",k)
     fmt.Println("sesson_id:",sesson_id) 
 
     db, _ := sql.Open(SqlDriver, SqlSourceName)
@@ -58,7 +58,7 @@ func QueryBookComment(w http.ResponseWriter, r *http.Request) {
         return
     }
     fmt.Println("连接成功")
-	respond := &QueryBookCommentRespond{}
+	respond := &TopkRespond{}
     if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
@@ -69,7 +69,7 @@ func QueryBookComment(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	} else {
-		query_err := GetBookComment(db,isbn,respond)
+		query_err := GetTopk(db,book_type,k,respond)
 		if query_err != nil {
 			respond.Code = Code.DatabaseErr
 			respond.Message = Message.DatabaseErr
@@ -84,16 +84,4 @@ func QueryBookComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(json_respond)
-
-}
-
-func GetBookComment (db *sql.DB,isbn string,re *QueryBookCommentRespond) error {
-	rows,db_err:=db.Query("select phone,isbn from book_comment where isbn!=\"\" and isbn =\""+isbn+"\";")
-	for rows.Next() {
-		var phone string
-		var isbn string
-		rows.Scan(&phone,&isbn)
-		re.CommentList = append(re.CommentList, BookCommentObj{phone,isbn})
-	}
-	return db_err
 }

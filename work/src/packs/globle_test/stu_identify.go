@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -34,7 +33,8 @@ func StuIdentify(w http.ResponseWriter, r *http.Request) {
 	request:=&StuIdentifyObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	phone := request.Phone
 	school := request.School

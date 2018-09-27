@@ -4,7 +4,6 @@ import ypclnt "github.com/sdk"
 import "net/http"
 import "fmt"
 import "encoding/json"
-import "log"
 import "time"
 import "io/ioutil"
 
@@ -13,7 +12,7 @@ type SendObj struct {
 }
 
 func Send_message (w http.ResponseWriter, r *http.Request) {
-	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	if string(str) =="" {
@@ -24,7 +23,8 @@ func Send_message (w http.ResponseWriter, r *http.Request) {
 	re:=&Respond{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	phone := request.Phone
 	fmt.Println("sent indentify code to "+phone)
@@ -46,7 +46,7 @@ func Send_message (w http.ResponseWriter, r *http.Request) {
 	}
 	re_json,json_err:=json.Marshal(re)
 	if json_err!=nil {
-		log.Fatal(json_err)
+		fmt.Println(json_err)
 	}
 	w.Write(re_json)
 }

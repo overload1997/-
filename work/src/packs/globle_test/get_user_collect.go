@@ -24,7 +24,7 @@ type GetUserCollectRespond struct {
 
 //phone,nickname,sex,pro_photo,signature
 func GetUserCollect(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	if string(str) =="" {
@@ -51,13 +51,13 @@ func GetUserCollect(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("连接成功")
 	respond := &GetUserCollectRespond{}
-	if SessonMap[phone] == nil {
+    if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
-	} else if sesson_id != SessonMap[phone].SessonId {
+	} else if _,ok:=SessonMap[phone]; ok&&sesson_id != SessonMap[phone].SessonId {
 		respond.Code = Code.SidErr
 		respond.Message = Message.SidErr
-	} else if SessonMap[phone].CheckOverdue() {
+	} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	}  else {

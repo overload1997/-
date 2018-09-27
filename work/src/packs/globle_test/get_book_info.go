@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -36,7 +35,7 @@ type GetBookInfoRespond struct {
 
 //phone,nickname,sex,pro_photo,signature
 func GetBookInfo(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	if string(str) =="" {
@@ -46,7 +45,8 @@ func GetBookInfo(w http.ResponseWriter, r *http.Request) {
 	request:=&GetBookInfoObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	phone := request.Phone 
 	isbn := request.Isbn
@@ -60,18 +60,18 @@ func GetBookInfo(w http.ResponseWriter, r *http.Request) {
     defer db.Close()
     println("尝试ping the 数据库")
     if err := db.Ping(); err != nil {
-        log.Fatal(err)
+        fmt.Println(err)
         return
     }
     fmt.Println("连接成功")
 	respond := &GetBookInfoRespond{}
-	if SessonMap[phone] == nil {
+    if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
-	} else if sesson_id != SessonMap[phone].SessonId {
+	} else if _,ok:=SessonMap[phone]; ok&&sesson_id != SessonMap[phone].SessonId {
 		respond.Code = Code.SidErr
 		respond.Message = Message.SidErr
-	} else if SessonMap[phone].CheckOverdue() {
+	} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	}  else {
@@ -99,7 +99,7 @@ func GetBookInfo(w http.ResponseWriter, r *http.Request) {
 	
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
-		log.Fatal(json_err)
+		fmt.Println(json_err)
 		return
 	}
 	w.Write(json_respond)

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -12,9 +11,8 @@ import (
 
 type AddUserCollectObj struct {
 	Phone string
-	Book_isbn string
+	Isbn string
 	Sesson_id string
-	Book_name string
 }
 
 type AddUserCollectRespond struct {
@@ -24,7 +22,7 @@ type AddUserCollectRespond struct {
 
 //phone,nickname,sex,pro_photo,signature
 func AddUserCollect(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	if string(str) =="" {
@@ -34,39 +32,37 @@ func AddUserCollect(w http.ResponseWriter, r *http.Request) {
 	request:=&AddUserCollectObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
     phone := request.Phone
 	sesson_id := request.Sesson_id
-	book_isbn := request.Book_isbn
-	book_name := request.Book_name
+	book_isbn := request.Isbn
 
     fmt.Println("phone:",phone)
 	fmt.Println("sesson_id:",sesson_id)
 	fmt.Println("book_isbn:",book_isbn)
-	fmt.Println("book_name:",book_name)
 
     db, _ := sql.Open(SqlDriver, SqlSourceName)
     defer db.Close()
     println("尝试ping the 数据库")
     if err := db.Ping(); err != nil {
-        log.Fatal(err)
+        fmt.Println(err)
         return
     }
     fmt.Println("连接成功")
 	respond := &AddUserCollectRespond{}
-	if SessonMap[phone] == nil {
+    if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
-	} else if sesson_id != SessonMap[phone].SessonId {
+	} else if _,ok:=SessonMap[phone]; ok&&sesson_id != SessonMap[phone].SessonId {
 		respond.Code = Code.SidErr
 		respond.Message = Message.SidErr
-	} else if SessonMap[phone].CheckOverdue() {
+	} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	}  else {
-		_,db_err:=db.Query("insert into user_collect(user, book_name,book_isbn) values("+phone+","+book_name+","+book_isbn+")")
-		fmt.Printf("%s\n", "insert into user_collect(user, book_name,book_isbn) values("+phone+","+book_name+","+book_isbn+")")
+		_,db_err:=db.Query("insert into user_collect(user, book_isbn) values(\""+phone+"\",\""+book_isbn+"\")")
+		fmt.Printf("%s\n", "insert into user_collect(user, book_isbn) values(\""+phone+"\",\""+book_isbn+"\")")
 		if db_err != nil {
 			fmt.Printf("%s\n", db_err)
 			respond.Code = Code.DatabaseErr
@@ -78,7 +74,7 @@ func AddUserCollect(w http.ResponseWriter, r *http.Request) {
     }
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
-		log.Fatal(json_err)
+		fmt.Printf("%+v\n", json_err)
 		return
 	}
 	w.Write(json_respond)

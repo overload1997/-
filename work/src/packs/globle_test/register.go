@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"io/ioutil"
 )
@@ -17,7 +16,7 @@ type RegisterObj struct {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("受到http请求") //把  body 内容读入字符串 s
+	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
 	if string(str) =="" {
@@ -27,7 +26,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	request:=&RegisterObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	phone := request.Phone
 	identify_code := request.Identify_code
@@ -40,7 +40,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	println("尝试ping the 数据库")
 	respond:=&Respond{}
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return
 	}
 	fmt.Println("连接成功")
@@ -75,7 +75,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
-		log.Fatal(json_err)
+		fmt.Println(json_err)
 		return
 	}
 	w.Write(json_respond)
