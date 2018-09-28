@@ -22,7 +22,6 @@ type GetClassifyBookRespond struct {
 
 type GetClassifyBookObj struct {
 	Phone string
-	Type string
 	K string
 	Sesson_id string
 }
@@ -42,11 +41,9 @@ func GetClassifyBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	phone := request.Phone
-	book_type := request.Type
 	k := request.K
 	sesson_id := request.Sesson_id
 
-    fmt.Println("book_type:",book_type)
     fmt.Println("k:",k)
     fmt.Println("sesson_id:",sesson_id) 
 
@@ -69,7 +66,7 @@ func GetClassifyBook(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	} else {
-		query_err := GetTopk(db,book_type,k,respond)
+		query_err := GetTopk(db,k,respond)
 		if query_err != nil {
 			respond.Code = Code.DatabaseErr
 			respond.Message = Message.DatabaseErr

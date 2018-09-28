@@ -12,6 +12,7 @@ import (
 
 type TopkObj struct {
 	Phone string
+	Book_type string
 	K string
 	Sesson_id string
 }
@@ -38,9 +39,11 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	phone := request.Phone
+	book_type := request.Book_type
 	k := request.K
 	sesson_id := request.Sesson_id
 
+    fmt.Println("book_type:",book_type)
     fmt.Println("k:",k)
     fmt.Println("sesson_id:",sesson_id) 
 
@@ -63,7 +66,7 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
 	} else {
-		query_err := GetTopk(db,k,respond)
+		query_err := GetTopk(db,book_type,k,respond)
 		if query_err != nil {
 			respond.Code = Code.DatabaseErr
 			respond.Message = Message.DatabaseErr
@@ -81,8 +84,8 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetTopk(db *sql.DB,k string,re *TopkRespond) error {
-	rows,db_err:=db.Query("select isbn from book_borrow_hisory,book_info where book_name!=\"\" and book_name=title group by book_name order by count(book_name) desc limit "+k+";")
+func GetTopk(db *sql.DB,book_type string,k string,re *TopkRespond) error {
+	rows,db_err:=db.Query("select isbn from book_borrow_history,book_info where book_name!=\"\" and book_name=title and type =\""+book_type+"\" group by book_name order by count(book_name) desc limit "+k+";")
 	for rows.Next() {
 		var isbn string
 		rows.Scan(&isbn)

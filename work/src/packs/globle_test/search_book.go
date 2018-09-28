@@ -10,20 +10,21 @@ import (
 	_ "github.com/Go-SQL-Driver/MySQL"
 )
 
-type TopkObj struct {
+type SearchBookObj struct {
 	Phone string
-	K string
+	Keyword string
 	Sesson_id string
 }
 
-type TopkRespond struct {
-	Message string
+type SearchBookRespond struct {
 	Code int
-	BookList []string
+	Message string
+	IsbnList []string
 }
 
+
 //phone,nickname,sex,pro_photo,signature
-func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
+func SearchBook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("收到http请求") //把  body 内容读入字符串 s
 	ReceiveClientRequest(w,r)//调用跨域解决函数           
 	str, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
@@ -31,18 +32,19 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(string(str))
-	request:=&TopkObj{}
+	request:=&SearchBookObj{}
 	err:=json.Unmarshal(str,request)
 	if err!=nil {
 		fmt.Println(err)
 		return
 	}
-	phone := request.Phone
-	k := request.K
+	phone := request.Phone 
+	keyword := request.Keyword
 	sesson_id := request.Sesson_id
 
-    fmt.Println("k:",k)
-    fmt.Println("sesson_id:",sesson_id) 
+    fmt.Println("phone:",phone)
+	fmt.Println("sesson_id:",sesson_id)
+	fmt.Println("isbn:",keyword)
 
     db, _ := sql.Open(SqlDriver, SqlSourceName)
     defer db.Close()
@@ -52,7 +54,7 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
         return
     }
     fmt.Println("连接成功")
-	respond := &TopkRespond{}
+	respond := &SearchBookRespond{}
     if _,ok:=SessonMap[phone] ; !ok {
 		respond.Code = Code.SidNone			
 		respond.Message = Message.SidNone
@@ -62,16 +64,26 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
 	} else if  _,ok:=SessonMap[phone]; ok && SessonMap[phone].CheckOverdue() {
 		respond.Code = Code.SidOverdue
 		respond.Message = Message.SidOverdue
-	} else {
-		query_err := GetTopk(db,k,respond)
-		if query_err != nil {
+	}  else {
+		rows,db_err:=db.Query(`select isbn from book_info where isbn!="" and (title like "%`+keyword+`%" or author like "%`+keyword+`%")`)
+		fmt.Printf("%+v\n",`select isbn from book_info where isbn!="" and (title like "%`+keyword+`%" or author like "%`+keyword+`%")`)
+		if db_err != nil {
+			fmt.Printf("%+v\n", db_err)
 			respond.Code = Code.DatabaseErr
 			respond.Message = Message.DatabaseErr
 		} else {
+			db.Query(`insert into user_search_log(phone,keyword) values(`+`"`+phone+`","`+keyword+`")`)
+			fmt.Printf("%+v\n", `insert into user_search_log(phone,keyword) values(`+`"`+phone+`","`+keyword+`")`)
 			respond.Code = Code.Success
-			respond.Message = Message.Success
+			respond.Message = Message.Success	
+			var isbn string
+			for rows.Next() {
+				rows.Scan(&isbn)
+				respond.IsbnList = append(respond.IsbnList, isbn)
+			}
 		}
     }
+	
 	json_respond, json_err := json.Marshal(respond)
 	if json_err != nil {
 		fmt.Println(json_err)
@@ -79,14 +91,4 @@ func GetBorrowTopk(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(json_respond)
 
-}
-
-func GetTopk(db *sql.DB,k string,re *TopkRespond) error {
-	rows,db_err:=db.Query("select isbn from book_borrow_hisory,book_info where book_name!=\"\" and book_name=title group by book_name order by count(book_name) desc limit "+k+";")
-	for rows.Next() {
-		var isbn string
-		rows.Scan(&isbn)
-		re.BookList = append(re.BookList, isbn)
-	}
-	return db_err
 }

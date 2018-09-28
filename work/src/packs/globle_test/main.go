@@ -39,6 +39,7 @@ func main() {
 	http.HandleFunc("/user/forget_password",ForgetPassword)
 	http.HandleFunc("/user/recommend_book",CommendBook)
 	http.HandleFunc("/user/drop_book_fri", DropUserFocus)
+	http.HandleFunc("/globle/search_book", SearchBook)
 	//http.Handle("/",http.FileServer(http.Dir("./")))
 	err := http.ListenAndServe(":5666", nil)
 	if err != nil {
