@@ -3,6 +3,7 @@ package main
 import "math/rand"
 import "time"
 
+var ClassifyDeadline int = 946731696
 var RandDigit = []byte{'0','1','2','3','4','5','6','7','8','9'}
 var RandChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 var SessonMap = make(map[string]*SessonKey)
